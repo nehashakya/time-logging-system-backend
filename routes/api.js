@@ -68,6 +68,7 @@ router.post('/login', function(req, res) {
                 return res.json({
                     success:true,
                     token: token,
+                    userId: usr._id,
                     message:'Token generated.'
                 });
            });
@@ -82,6 +83,41 @@ router.post('/login', function(req, res) {
 });
 
 
+// ---------------------------------------------------------
+// route middleware to authenticate and check token
+// ---------------------------------------------------------
+// router.use(function(req, res, next) {
+
+//     // check header or url parameters or post parameters for token
+//     var token = req.body.token || req.query.token || req.headers['x-access-token'] || req.headers['authorization'];
+
+//     // decode token
+//     if (token) {
+//         // verifies secret and checks exp            
+//         jwt.verify(token, secretKey, function(err, decoded) {
+//             if (err) {
+//                return res.json({ success: false, message: 'Failed to authenticate token.' });
+//             } else {
+//                 // if everything is good, save to request for use in other routesr
+//                 next();
+//             }
+//         });
+//     } else {
+//         // if there is no token
+//         // return an error
+//         return res.status(403).send({
+//             success: false,
+//             message: 'No token provided.'
+//         });
+//     }
+// });
+
+
+/*
+******************************************************************************************************************
+*/
+
+
 /* GET: findAllUsers */
 router.get('/users', function(req, res, next) {
     console.log("Get all users API successfully called.");
@@ -92,10 +128,20 @@ router.get('/users', function(req, res, next) {
 });
 
 /* GET: findUserById */
-router.get('/users/:id', function(req, res, next) {
-    console.log("Get used by id API successfully called.");
-	const id = req.params.id;
-  	userModel.findById({_id:id}, function (err, results) {
+// router.get('/users/:id', function(req, res, next) {
+//     console.log("Get user by id API successfully called." + req.params.id);
+// 	const id = req.params.id;
+//   	userModel.findById({_id:id}, function (err, results) {
+//         if (err) throw err;
+//         res.send(results);
+//     });
+// });
+
+/* GET: findUserByUsername */
+router.get('/users/:username', function(req, res, next) {
+    console.log("Get user by id API successfully called." + req.params.username);
+    const username = req.params.username;
+    userModel.findOne({username:username}, function (err, results) {
         if (err) throw err;
         res.send(results);
     });
@@ -154,6 +200,7 @@ router.get('/users/:id/workLogs', function(req, res, next) {
     });
 });
 
+
 /* GET: findWorkLogs */
 router.get('/workLogs', function(req, res, next) {
     workLogModel.find({}, function (err, results) {
@@ -169,18 +216,22 @@ router.get('/workLogs', function(req, res, next) {
 
 /* POST: create */
 router.post('/users/:id/workLogs', function(req, res, next) {
-    console.log('Create');
+    console.log('Creating workLog...');
     const id = req.params.id;
+    console.log(">>>" + id);
     userModel.findById({_id:id}, function (err, results) {
         if (err) throw err;
         var workLog = new workLogModel({
+            date: req.body.date,
             titleOfWork : req.body.titleOfWork,
             descriptionOfWork : req.body.descriptionOfWork,
             noOfHours : req.body.noOfHours,
             user : results
         });
+        console.log(";;;" + results);
         workLog.save(function (err, result) {
-            if (err) return err;
+            if (err) throw err;
+            console.log("//////" + result);
             res.send(result);
         });
     });

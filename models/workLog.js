@@ -5,6 +5,8 @@ var bcrypt = require('bcrypt-nodejs');
 var Schema = mongoose.Schema;
 
 var workLogSchema = new Schema({
+	// date format: Mon Jan 02 2012 00:00:00 GMT+0100
+	date : String,
 	titleOfWork : String,
     descriptionOfWork : String,
     noOfHours : Number,
