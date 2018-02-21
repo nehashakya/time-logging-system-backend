@@ -128,24 +128,15 @@ router.get('/users', function(req, res, next) {
 });
 
 /* GET: findUserById */
-// router.get('/users/:id', function(req, res, next) {
-//     console.log("Get user by id API successfully called." + req.params.id);
-// 	const id = req.params.id;
-//   	userModel.findById({_id:id}, function (err, results) {
-//         if (err) throw err;
-//         res.send(results);
-//     });
-// });
-
-/* GET: findUserByUsername */
-router.get('/users/:username', function(req, res, next) {
-    console.log("Get user by id API successfully called." + req.params.username);
-    const username = req.params.username;
-    userModel.findOne({username:username}, function (err, results) {
+router.get('/users/:id', function(req, res, next) {
+    console.log("Get user by id API successfully called." + req.params.id);
+	const id = req.params.id;
+  	userModel.findById({_id:id}, function (err, results) {
         if (err) throw err;
         res.send(results);
     });
 });
+
 
 /* POST: createUser */
 router.post('/users', function(req, res, next) {
