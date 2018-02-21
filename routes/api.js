@@ -30,7 +30,7 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 
 
 router.post('/login', function(req, res) {
-    console.log("Login API successfully called.");
+    console.log("Logging in...");
     // find user
     userModel.findOne({username : req.body.username}, function(err, usr) {
         if (err) {
@@ -120,7 +120,7 @@ router.post('/login', function(req, res) {
 
 /* GET: findAllUsers */
 router.get('/users', function(req, res, next) {
-    console.log("Get all users API successfully called.");
+    console.log("Getting all users...");
   	userModel.find({}, function (err, results) {
         if (err) throw err;
         res.send(results);
@@ -129,8 +129,8 @@ router.get('/users', function(req, res, next) {
 
 /* GET: findUserById */
 router.get('/users/:id', function(req, res, next) {
-    console.log("Get user by id API successfully called." + req.params.id);
-	const id = req.params.id;
+    const id = req.params.id;
+    console.log("Getting user for id " + id);
   	userModel.findById({_id:id}, function (err, results) {
         if (err) throw err;
         res.send(results);
@@ -140,12 +140,16 @@ router.get('/users/:id', function(req, res, next) {
 
 /* POST: createUser */
 router.post('/users', function(req, res, next) {
-    console.log('Create user API successfully called.');
+    console.log('Creatind user...' + req.body.contactinfo);
 	var user = new userModel({
         username: req.body.username,
         password: req.body.password,
 		firstname: req.body.firstname,
-		lastname: req.body.lastname
+		lastname: req.body.lastname,
+        email : req.body.email,
+        contactinfo : req.body.contactinfo,
+        designation : req.body.designation,
+        department: req.body.department
 	});
     user.save(function (err, result) {
   		if (err) return handleError(err);
@@ -155,13 +159,8 @@ router.post('/users', function(req, res, next) {
 
 /* PUT: updateUserById */
 router.put('/users/:id', function(req, res, next) {
-    console.log('Update user API successfully called.');
-	const id = req.params.id;
-	// var updatedusrloyee = {
-	// 	first_name: req.body.firstName,
-	// 	last_name: req.body.lastName
-	// };
-	// console.log(updatedusrloyee);
+    const id = req.params.id;
+    console.log('Updating user with id ' + id);
 	userModel.findByIdAndUpdate({_id:id}, req.body, {new: true}, function (err, results) {
         if (err) throw err;
         res.send(results);
@@ -170,8 +169,8 @@ router.put('/users/:id', function(req, res, next) {
 
 /* DELETE: deleteUserById */
 router.delete('/users/:id', function(req, res, next) {
-    console.log('Delete user API successfully called.');
-	const id = req.params.id;
+    const id = req.params.id;
+    console.log('Deleting user with id ' + id);
 	userModel.deleteOne({_id:id}, function (err, results) {
         if (err) throw err;
         res.send(results);
@@ -185,31 +184,17 @@ router.delete('/users/:id', function(req, res, next) {
 /* GET: findWorkLogsById */
 router.get('/users/:id/workLogs', function(req, res, next) {
     const id = req.params.id;
+    console.log('Getting worklogs of user with id ' + id);
     workLogModel.find({user:id}, function (err, results) {
         if (err) throw err;
         res.send(results);
     });
 });
 
-
-/* GET: findWorkLogs */
-router.get('/workLogs', function(req, res, next) {
-    workLogModel.find({}, function (err, results) {
-        if (err) throw err;
-        res.send(results);
-    });
-});
-
-
-/*
-******************************************************************************************************************
-*/
-
 /* POST: create */
 router.post('/users/:id/workLogs', function(req, res, next) {
-    console.log('Creating workLog...');
     const id = req.params.id;
-    console.log(">>>" + id);
+    console.log('Creating workLog for user with id ' + id);
     userModel.findById({_id:id}, function (err, results) {
         if (err) throw err;
         var workLog = new workLogModel({
@@ -219,13 +204,26 @@ router.post('/users/:id/workLogs', function(req, res, next) {
             noOfHours : req.body.noOfHours,
             user : results
         });
-        console.log(";;;" + results);
         workLog.save(function (err, result) {
             if (err) throw err;
             console.log("//////" + result);
             res.send(result);
         });
     });
+});
+
+/*
+******************************************************************************************************************
+*/
+
+/* GET: findWorkLogs */
+router.get('/workLogs', function(req, res, next) {
+    console.log('Getting all worklogs...')
+    workLogModel.find().populate('user')
+        .exec(function (err, results) {
+            if (err) throw err;
+            res.send(results);
+          });
 });
 
 module.exports = router;

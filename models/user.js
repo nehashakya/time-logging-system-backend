@@ -9,6 +9,10 @@ var userSchema = new Schema({
     password : String,
     firstname : String,
     lastname : String,
+    email : String,
+    contactinfo : String,
+    designation : String,
+    department: String,
     workLog : {
       type: mongoose.Schema.Types.ObjectId, 
       ref: 'workLog'
